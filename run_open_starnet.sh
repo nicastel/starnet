@@ -11,5 +11,4 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-export TF_USE_LEGACY_KERAS=1
-python3.13 open_starnet.py $@
+python3.12 open_starnet.py $@

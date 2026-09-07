@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.keras as K
 import tensorflow.keras.layers as L
+import keras.ops as O
 import copy
 import pickle
 import tifffile as tiff
@@ -373,9 +374,9 @@ class StarNet():
             output = output[offset:-(offset+dh), offset:-(offset+dw), :]
         
         if input_dtype == 'uint8':
-            tiff.imsave(out_name, (output * 255).astype('uint8'))
+            tiff.imwrite(out_name, (output * 255).astype('uint8'))
         else:
-            tiff.imsave(out_name, (output * 255 * 255).astype('uint16'))
+            tiff.imwrite(out_name, (output * 255 * 255).astype('uint16'))
         
     def _generator(self, m):
         layers = []
@@ -437,53 +438,53 @@ class StarNet():
         layers.append(normalized)
             
         # layer 9
-        concatenated = tf.concat([layers[-1], layers[6]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[6]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(filters[9], kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         normalized = L.BatchNormalization()(deconvolved, training = True)
         layers.append(normalized)
         
         # layer 10
-        concatenated = tf.concat([layers[-1], layers[5]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[5]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(filters[10], kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         normalized = L.BatchNormalization()(deconvolved, training = True)
         layers.append(normalized)
             
         # layer 11
-        concatenated = tf.concat([layers[-1], layers[4]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[4]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(filters[11], kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         normalized = L.BatchNormalization()(deconvolved, training = True)
         layers.append(normalized)
             
         # layer 12
-        concatenated = tf.concat([layers[-1], layers[3]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[3]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(filters[12], kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         normalized = L.BatchNormalization()(deconvolved, training = True)
         layers.append(normalized)
             
         # layer 13
-        concatenated = tf.concat([layers[-1], layers[2]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[2]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(filters[13], kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         normalized = L.BatchNormalization()(deconvolved, training = True)
         layers.append(normalized)
             
         # layer 14
-        concatenated = tf.concat([layers[-1], layers[1]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[1]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(filters[14], kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         normalized = L.BatchNormalization()(deconvolved, training = True)
         layers.append(normalized)
             
         # layer 15
-        concatenated = tf.concat([layers[-1], layers[0]], axis = 3)
+        concatenated = O.concatenate([layers[-1], layers[0]], axis = 3)
         rectified = L.ReLU()(concatenated)
         deconvolved = L.Conv2DTranspose(self.input_channels, kernel_size = 4, strides = (2, 2), padding = "same", kernel_initializer = tf.initializers.GlorotUniform())(rectified)
         rectified = L.ReLU()(deconvolved)
-        output = tf.math.subtract(input, rectified)
+        output = O.subtract(input, rectified)
         
         return K.Model(inputs = input, outputs = output, name = "generator")
         
@@ -548,7 +549,7 @@ class StarNet():
             
         # layer 10
         dense = L.Dense(1)(layers[-1])
-        sigmoid = tf.nn.sigmoid(dense)
+        sigmoid = O.sigmoid(dense)
         layers.append(sigmoid)
         
         output = [layers[0], layers[1], layers[2], layers[3], layers[4], layers[5], layers[6], layers[7], layers[-1]]
