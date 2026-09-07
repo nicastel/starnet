@@ -1,0 +1,10 @@
+# open starnet requirements
+# python 3.12
+# gpu accelerated tensorflow on macos
+tifffile==2024.5.22
+tensorflow==2.18.0
+tensorflow-metal
+numpy
+tf-keras==2.18.0
+matplotlib
+numba

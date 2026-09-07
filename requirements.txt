@@ -1,4 +1,5 @@
 # open starnet requirements
+# python 3.13
 tifffile
 tensorflow
 numpy
