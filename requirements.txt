@@ -1,0 +1,7 @@
+# open starnet requirements
+tifffile
+tensorflow
+numpy
+tf-keras
+matplotlib
+numba
