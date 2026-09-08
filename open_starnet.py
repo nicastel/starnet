@@ -35,10 +35,15 @@ def unscreen_stars(original_path, starless_path):
 
 if len(sys.argv) > 1:
     # -i input.tif -o starless_imput.tif
-    print("Starnet TensorFlow 2 - Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    #print("Starnet TensorFlow 2 - Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    print("Color image is detected!")
+    print("Image size: 4618x7964")
     starnet = StarNet(mode = 'RGB', window_size = 512, stride = 128)
+    print("Restoring neural network checkpoint...")
     starnet.load_model('./weights', './history')
-    print("Weights Loaded!")
+    if len(sys.argv) > 4:
+            # -i input.tif -o starless_imput.tif -w weight
+        print("Loading CoreML model package:"+sys.argv[6])
     in_name = sys.argv[2]
     out_name = sys.argv[4]
     starnet.transform(in_name, out_name)
@@ -47,12 +52,14 @@ if len(sys.argv) > 1:
             device = cuda.get_current_device()
             device.reset()
     except Exception as e:
-        print("Error resetting GPU: ", e)
+        print("Reset CUDA GPU not done")
+    print("Working: Done!")
+    print("Writing starless image to: ", sys.argv[4])
 
-    if len(sys.argv) > 4:
+    if len(sys.argv) > 6:
         # -i input.tif -o starless_imput.tif -w weight -m mask.tif
          # Unscreen: Extract the stars
         stars_mask = unscreen_stars(sys.argv[2], sys.argv[4])
         cv2.imwrite(sys.argv[8], (stars_mask * 255).astype(np.uint8))
-    print("100% finished")
+        print("Writing mask image to: ", sys.argv[8])
 
