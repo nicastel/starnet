@@ -1,10 +1,10 @@
 # open starnet requirements
-# python 3.12
-# gpu accelerated tensorflow on macos
+# python 3.0
+# gpu accelerated tensorflow on windows with directml
 tifffile==2024.5.22
-tensorflow==2.18.0
-tensorflow-metal
+tensorflow==2.10.0
+tensorflow-directml-plugin
 numpy
-tf-keras==2.18.0
+tf-keras==2.10.0
 matplotlib
 numba
