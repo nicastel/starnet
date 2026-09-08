@@ -1,5 +1,5 @@
 # open starnet requirements
-# python 3.0
+# python 3.10
 # gpu accelerated tensorflow on windows with directml
 tifffile==2024.5.22
 tensorflow==2.10.0
