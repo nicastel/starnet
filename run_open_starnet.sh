@@ -4,8 +4,7 @@ echo $@ > args.txt
 # Loop through arguments
 case "$1" in
   -v|--version)
-    echo "StarNet++ v2"
-    #echo "starnet2  version: 1.0.0"
+    echo "starnet2  version: 1.0.0"
     exit 0
     ;;
 esac
