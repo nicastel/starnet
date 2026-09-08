@@ -11,10 +11,6 @@ import copy
 import pickle
 import tifffile as tiff
 
-from matplotlib import pyplot as plt
-
-from IPython import display
-
 class StarNet():
     def __init__(self, mode:str, window_size:int = 512, stride:int = 256, lr:float = 1e-4, train_folder:str = './train/', batch_size:int = 1):
         assert mode in ['RGB', 'Greyscale'], "Mode should be either RGB or Greyscale"
@@ -190,27 +186,7 @@ class StarNet():
                 y = y * 2 - 1
                 
                 if warm_up: y = x
-                
-                if i % plot_interval == 0 and plot_progress:
-                    plt.close()
-                    fig, ax = plt.subplots(1, 3, sharex = True, figsize=(16.5, 16.5))
-                    if self.mode == 'RGB':
-                        ax[0].imshow((x[0] + 1) / 2)
-                        ax[0].set_title('Original')
-                        ax[1].imshow((self.G(x)[0] + 1) / 2)
-                        ax[1].set_title('Starless')
-                        ax[2].imshow((y[0] + 1) / 2)
-                        ax[2].set_title('Target')
-                    else:
-                        ax[0].imshow((x[0, :, :, 0] + 1) / 2, cmap='gray', vmin = 0, vmax = 1)
-                        ax[0].set_title('Original')
-                        ax[1].imshow((self.G(x)[0, :, :, 0] + 1) / 2, cmap='gray', vmin = 0, vmax = 1)
-                        ax[1].set_title('Starless')
-                        ax[2].imshow((y[0, :, :, 0] + 1) / 2, cmap='gray', vmin = 0, vmax = 1)
-                        ax[2].set_title('Target')
-                    
-                    display.clear_output(wait = True)
-                    display.display(plt.gcf())
+            
                 
                 if i > 0:
                     print("\rEpoch: %d. Iteration %d / %d Loss %f    " % (e, i, self.iters_per_epoch, self.history['total'][-1]), end = '')
@@ -365,6 +341,7 @@ class StarNet():
                 tile = (self.G(tile)[0] + 1) / 2
                 tile = tile[offset:offset+self.stride, offset:offset+self.stride, :]
                 output[x+offset:self.stride*(i+1)+offset, y+offset:self.stride*(j+1)+offset, :] = tile
+                print("\rWorking: %d%%" % (int((i * itw + j) / (ith * itw) * 100)), end = '', flush = True)
         
         output = np.clip(output, 0, 1)
         
