@@ -50,9 +50,9 @@ if len(sys.argv) > 1:
         print("Error resetting GPU: ", e)
 
     if len(sys.argv) > 4:
-        # -i input.tif -o starless_imput.tif -m mask.tif
+        # -i input.tif -o starless_imput.tif -w weight -m mask.tif
          # Unscreen: Extract the stars
         stars_mask = unscreen_stars(sys.argv[2], sys.argv[4])
-        cv2.imwrite(sys.argv[6], (stars_mask * 255).astype(np.uint8))
+        cv2.imwrite(sys.argv[8], (stars_mask * 255).astype(np.uint8))
     print("100% finished")
 
