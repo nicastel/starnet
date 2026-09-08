@@ -1,15 +1,25 @@
-import tensorflow as tf
-from PIL import Image as img
+import os
 import logging
+import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
+# 1. Block standard TensorFlow C++ logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.environ['GLOG_minloglevel'] = '3'
+os.environ["GRPC_VERBOSITY"] = "ERROR"
+os.environ['PYCARET_CUSTOM_LOGGING_LEVEL'] = 'CRITICAL'
+# 2. Tell Abseil to stop printing pre-initialization logs to STDERR
+import absl.logging
+absl.logging._warn_preinit_stderr = False
+import warnings
+warnings.filterwarnings("ignore")
+
 from starnet_v1_TF2 import StarNet
-import tifffile as tiff
 import sys
 from numba import cuda
 import cv2
 import numpy as np
-import warnings
-warnings.filterwarnings("ignore")
+
+
 
 def unscreen_stars(original_path, starless_path):
     """
@@ -35,38 +45,50 @@ def unscreen_stars(original_path, starless_path):
     
     return stars
 
-if len(sys.argv) > 1:
-    # -i input.tif -o starless_imput.tif
+if len(sys.argv) > 2:
+
     #print("Starnet TensorFlow 2 - Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-    print("Color image is detected!")
-    print("Image size: 4618x7964")
+    print("MPS backend", end="\n", flush=True)
+    print("Color image is detected!", end="\n", flush=True)
+    print("Image size: 3021x2640", end="\n", flush=True)
     starnet = StarNet(mode = 'RGB', window_size = 512, stride = 128)
 
     print("Restoring neural network checkpoint...")
-    if len(sys.argv) > 4:
-            # -i input.tif -o starless_imput.tif -w weight
+
+    if len(sys.argv) > 3:
+        # -i input.tif -o starless_input.tif
+        in_name = sys.argv[2]
+        out_name = sys.argv[4]
+    else:
+        # input.tif starless_input.tif
+        in_name = sys.argv[1]
+        out_name = sys.argv[2]
+
+    if len(sys.argv) > 5:
+            # -i input.tif -o starless_input.tif -w weight
         print("Loading CoreML model package:"+sys.argv[6])
     starnet.load_model('./weights', './history')
 
-    in_name = sys.argv[2]
-    out_name = sys.argv[4]
-    print("Working: 0%", end="\r", flush=True)
+
+    print("Working: 1%", end="\r", flush=True)
     starnet.transform(in_name, out_name)
-    print("Working: Done!")
+    print("Working: 100%", end="\r", flush=True)
 
     try:
         if cuda.is_available:
             device = cuda.get_current_device()
             device.reset()
     except Exception as e:
-        print("") 
+        pass
 
-    print("Writing starless image to: ", sys.argv[4])
+    print("Writing starless image to: ", out_name)
 
-    if len(sys.argv) > 6:
-        # -i input.tif -o starless_imput.tif -w weight -m mask.tif
+    if len(sys.argv) > 7:
+        # -i input.tif -o starless_input.tif -w weight -m mask.tif
          # Unscreen: Extract the stars
-        stars_mask = unscreen_stars(sys.argv[2], sys.argv[4])
+        stars_mask = unscreen_stars(in_name, out_name)
         cv2.imwrite(sys.argv[8], (stars_mask * 255).astype(np.uint8))
         print("Writing mask image to: ", sys.argv[8])
+    else:
+        print("100% finished")
 
