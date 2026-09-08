@@ -6,3 +6,4 @@ numpy
 tf-keras
 matplotlib
 numba
+opencv-python
