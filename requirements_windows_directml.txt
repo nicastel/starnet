@@ -6,6 +6,5 @@ tensorflow==2.10.0
 tensorflow-directml-plugin
 numpy
 tf-keras==2.10.0
-matplotlib
 numba
 opencv-python==4.10.0.84

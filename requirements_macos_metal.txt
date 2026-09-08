@@ -6,6 +6,5 @@ tensorflow==2.18.0
 tensorflow-metal
 numpy
 tf-keras==2.18.0
-matplotlib
 numba
 opencv-python==4.10.0.84
