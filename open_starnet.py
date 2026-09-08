@@ -8,6 +8,8 @@ import sys
 from numba import cuda
 import cv2
 import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
 
 def unscreen_stars(original_path, starless_path):
     """
@@ -39,21 +41,26 @@ if len(sys.argv) > 1:
     print("Color image is detected!")
     print("Image size: 4618x7964")
     starnet = StarNet(mode = 'RGB', window_size = 512, stride = 128)
+
     print("Restoring neural network checkpoint...")
-    starnet.load_model('./weights', './history')
     if len(sys.argv) > 4:
             # -i input.tif -o starless_imput.tif -w weight
         print("Loading CoreML model package:"+sys.argv[6])
+    starnet.load_model('./weights', './history')
+
     in_name = sys.argv[2]
     out_name = sys.argv[4]
+    print("Working: 0%", end="\r", flush=True)
     starnet.transform(in_name, out_name)
+    print("Working: Done!")
+
     try:
         if cuda.is_available:
             device = cuda.get_current_device()
             device.reset()
     except Exception as e:
-        print("Reset CUDA GPU not done")
-    print("Working: Done!")
+        print("") 
+
     print("Writing starless image to: ", sys.argv[4])
 
     if len(sys.argv) > 6:
