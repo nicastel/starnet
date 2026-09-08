@@ -48,12 +48,11 @@ def unscreen_stars(original_path, starless_path):
 if len(sys.argv) > 2:
 
     #print("Starnet TensorFlow 2 - Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-    print("MPS backend", end="\n", flush=True)
-    print("Color image is detected!", end="\n", flush=True)
-    print("Image size: 3021x2640", end="\n", flush=True)
+    print("Color image is detected!", end="\n\r", flush=True)
+    print("Image size: 3021x2640", end="\n\r", flush=True)
     starnet = StarNet(mode = 'RGB', window_size = 512, stride = 128)
 
-    print("Restoring neural network checkpoint...")
+    print("Restoring neural network checkpoint...", end="\n\r", flush=True)
 
     if len(sys.argv) > 3:
         # -i input.tif -o starless_input.tif
@@ -66,13 +65,10 @@ if len(sys.argv) > 2:
 
     if len(sys.argv) > 5:
             # -i input.tif -o starless_input.tif -w weight
-        print("Loading CoreML model package:"+sys.argv[6])
+        print("Loading CoreML model package:"+sys.argv[6], end="\n\r", flush=True)
     starnet.load_model('./weights', './history')
 
-
-    print("Working: 1%", end="\r", flush=True)
     starnet.transform(in_name, out_name)
-    print("Working: 100%", end="\r", flush=True)
 
     try:
         if cuda.is_available:
@@ -81,14 +77,14 @@ if len(sys.argv) > 2:
     except Exception as e:
         pass
 
-    print("Writing starless image to: ", out_name)
+    print("Writing starless image to: ", out_name, end="\n\r", flush=True)
 
     if len(sys.argv) > 7:
         # -i input.tif -o starless_input.tif -w weight -m mask.tif
          # Unscreen: Extract the stars
         stars_mask = unscreen_stars(in_name, out_name)
         cv2.imwrite(sys.argv[8], (stars_mask * 255).astype(np.uint8))
-        print("Writing mask image to: ", sys.argv[8])
+        print("Writing mask image to: ", sys.argv[8], end="\n\r", flush=True)
     else:
-        print("100% finished")
+        print("100% finished", end="\n\r", flush=True)
 
